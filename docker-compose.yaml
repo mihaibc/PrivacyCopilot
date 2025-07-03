@@ -1,1 +1,13 @@
-# Docker Compose for local orchestration
+
+version: '3.8'
+services:
+  frontend:
+    build:
+      context: ./infra/docker
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "5173:80"
+    volumes:
+      - ./frontend:/app
+    environment:
+      - NODE_ENV=production

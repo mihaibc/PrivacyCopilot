@@ -1,1 +1,13 @@
-# Dockerfile for frontend
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY ../../frontend/package.json ../../frontend/package-lock.json ./
+RUN apk update && apk upgrade && npm install
+COPY ../../frontend .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY ../../frontend/public/manifest.json /usr/share/nginx/html/manifest.json
+COPY ../../frontend/public/favicon.ico /usr/share/nginx/html/favicon.ico
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

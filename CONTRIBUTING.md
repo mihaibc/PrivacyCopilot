@@ -1,6 +1,7 @@
+
 # Contribution Guidelines
 
-Thank you for your interest in contributing to PrivacyPilot! Your help is greatly appreciated.
+Thank you for your interest in contributing to Privacy Copilot! Your help is greatly appreciated.
 
 ## How to Contribute
 You can contribute in the following ways:
@@ -21,8 +22,8 @@ You can contribute in the following ways:
 ### Step 3: Create a Branch
 - Clone your forked repository and create a descriptive branch:
 ```bash
-git clone https://github.com/<your-username>/PrivacyPilot.git
-cd PrivacyPilot
+git clone https://github.com/<your-username>/Privacy-Copilot.git
+cd Privacy-Copilot
 git checkout -b feature/<short-description>
 ```
 
@@ -58,4 +59,4 @@ Fixes #IssueNumber
 
 ---
 
-🙏 **Thank you for contributing to PrivacyPilot!**
+🙏 **Thank you for contributing to Privacy Copilot!**

@@ -1,9 +1,3 @@
-Absolutely! Here’s your updated README, reworked for the Privacy Copilot project, preserving your clear structure while updating the features, goals, and technical details to reflect your new hybrid AI, RAG, privacy, and MLOps showcase.
-
-⸻
-
-
-
 # 🛡️ Privacy Copilot – Private AI, RAG & Backend Showcase
 
 
@@ -166,7 +160,7 @@ privacy-copilot/
 ├── docs/                 # Documentation & API specs
 ├── docker-compose.yaml   # Local stack orchestration
 └── ...                   # Standard configs (LICENSE, .gitignore, etc.)
-
+```
 
 ⸻
 

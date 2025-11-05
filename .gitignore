@@ -49,3 +49,14 @@ Thumbs.db
 coverage/
 *.cover
 local structure.md
+
+# Python cache and build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Go build artifacts
+backend/backend
+backend/privacy-copilot-api

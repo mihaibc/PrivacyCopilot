@@ -1,6 +1,5 @@
-@import "tailwindcss/preflight";
-@tailwind components;
-@tailwind utilities;
+/* Tailwind v4 single import (base, components, utilities) */
+@import "tailwindcss";
 
 /* Side menu bottom (settings icon) */
 .side-menu-bottom {
@@ -413,5 +412,4 @@
   0%, 80%, 100% { opacity: 0.2; }
   40% { opacity: 1; }
 }
-
 

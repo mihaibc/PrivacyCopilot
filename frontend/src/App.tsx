@@ -2,7 +2,7 @@
 import React from "react";
 import "./App.css";
 import "./index.css";
-import AppShell from "./components/AppShell";
+import DesignApp from "./pages/DesignApp";
 
 // Theme utility (currently unused)
 // function setTheme(theme) {
@@ -33,6 +33,6 @@ const USER_AVATAR = (
 
 
 
-export default function App() {
-  return <AppShell />;
+export default function App(): React.ReactElement {
+  return <DesignApp />;
 }

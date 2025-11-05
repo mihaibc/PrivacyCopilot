@@ -60,3 +60,4 @@ __pycache__/
 # Go build artifacts
 backend/backend
 backend/privacy-copilot-api
+designs/

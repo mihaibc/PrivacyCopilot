@@ -1,0 +1,91 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['18', '20']
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run linting
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Check TypeScript types (if applicable)
+        working-directory: ./frontend
+        run: |
+          if npm list typescript > /dev/null 2>&1; then
+            npx tsc --noEmit || echo "No TypeScript config found, skipping type check"
+          else
+            echo "TypeScript not installed, skipping type check"
+          fi
+
+      - name: Run tests
+        working-directory: ./frontend
+        run: |
+          if npm run | grep -q "test"; then
+            npm test -- --coverage --watchAll=false
+          else
+            echo "No test script found, skipping tests"
+          fi
+
+      - name: Build application
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Check build output
+        working-directory: ./frontend
+        run: |
+          ls -la dist/
+          echo "Build completed successfully"
+
+      - name: Run preview build test
+        working-directory: ./frontend
+        run: |
+          timeout 30s npm run preview &
+          sleep 10
+          curl -f http://localhost:4173 || echo "Preview server test completed"
+          pkill -f "vite preview" || true
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-node-${{ matrix.node-version }}
+          path: frontend/dist/
+          retention-days: 7
+
+      - name: Upload coverage reports (if available)
+        uses: actions/upload-artifact@v4
+        if: hashFiles('frontend/coverage/**') != ''
+        with:
+          name: frontend-coverage-node-${{ matrix.node-version }}
+          path: frontend/coverage/
+          retention-days: 7

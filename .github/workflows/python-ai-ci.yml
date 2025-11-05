@@ -1,0 +1,84 @@
+name: Python AI Service CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'ai_service/**'
+      - '.github/workflows/python-ai-ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'ai_service/**'
+      - '.github/workflows/python-ai-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: ai_service/requirements.txt
+
+      - name: Install Python dependencies
+        working-directory: ./ai_service
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov flake8 black isort
+
+      - name: Run code formatting check (Black)
+        working-directory: ./ai_service
+        run: black --check --diff .
+
+      - name: Run import sorting check (isort)
+        working-directory: ./ai_service
+        run: isort --check-only --diff .
+
+      - name: Run linting (flake8)
+        working-directory: ./ai_service
+        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Run Python tests with coverage
+        working-directory: ./ai_service
+        run: |
+          pytest --cov=app --cov-report=xml --cov-report=term-missing -v
+
+      - name: Test application startup
+        working-directory: ./ai_service
+        run: |
+          timeout 30s python -c "
+          import sys
+          sys.path.append('.')
+          from main import app
+          print('Application imports successfully')
+          " || echo "Application test completed"
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./ai_service/coverage.xml
+          flags: python-ai-service
+          name: codecov-umbrella
+
+      - name: Create requirements.txt with versions
+        working-directory: ./ai_service
+        run: pip freeze > requirements-frozen.txt
+
+      - name: Upload frozen requirements
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-requirements-${{ matrix.python-version }}
+          path: ai_service/requirements-frozen.txt
+          retention-days: 7

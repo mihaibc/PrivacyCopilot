@@ -1,0 +1,65 @@
+name: Go Backend CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/go-backend-ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/go-backend-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go environment
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache: true
+          cache-dependency-path: backend/go.sum
+
+      - name: Download Go dependencies
+        working-directory: ./backend
+        run: go mod download
+
+      - name: Verify Go dependencies
+        working-directory: ./backend
+        run: go mod verify
+
+      - name: Run Go vet
+        working-directory: ./backend
+        run: go vet ./...
+
+      - name: Run Go tests
+        working-directory: ./backend
+        run: go test -v -race -cover ./...
+
+      - name: Build Go application
+        working-directory: ./backend
+        run: go build -v -o privacy-copilot-api .
+
+      - name: Run Go fmt check
+        working-directory: ./backend
+        run: |
+          if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+            echo "The following files are not formatted:"
+            gofmt -s -l .
+            exit 1
+          fi
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-backend-binary
+          path: backend/privacy-copilot-api
+          retention-days: 7
